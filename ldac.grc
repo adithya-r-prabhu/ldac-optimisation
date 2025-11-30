@@ -1,0 +1,338 @@
+options:
+  parameters:
+    author: LDAC Project Team
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: Real/Lossy LDAC encoder/decoder using wrapper implementations
+    copyright: ''
+    description: LDAC Real/Lossy Codec - S16 format, lookahead buffering, characteristic
+      artifacts
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: no_gui
+    hier_block_src_path: '.:'
+    id: test_ldac
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: run
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: LDAC Real/Lossy Codec System - Wrapper Implementation
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [0, 36.0]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: ldac_mtu
+  id: variable
+  parameters:
+    comment: 'BLOCK #3: Maximum Transmission Unit
+
+      Controls LDAC frame packing size
+
+      Larger MTU = better compression, more latency'
+    value: '1024'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [944, 12.0]
+    rotation: 0
+    state: enabled
+- name: ldac_quality
+  id: variable
+  parameters:
+    comment: 'BLOCK #2: LDAC Quality Setting
+
+      0 = High Quality (~990 kbps, more artifacts)
+
+      1 = Standard Quality (~660 kbps)
+
+      2 = Mobile Quality (~330 kbps, most lossy)'
+    value: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [624, 20.0]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: 'BLOCK #1: Sample Rate Variable
+
+      48 kHz sampling rate for LDAC encoding
+
+      Required by real/lossy encoder implementation'
+    value: '48000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [296, 20.0]
+    rotation: 0
+    state: enabled
+- name: blocks_deinterleave_0
+  id: blocks_deinterleave
+  parameters:
+    affinity: ''
+    alias: ''
+    blocksize: '1'
+    comment: 'BLOCK #9: Deinterleave to L/R Channels
+
+      Separates decoded lossy signal
+
+      into left and right channels
+
+      Prepares for WAV file writing'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_streams: '2'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1376, 288.0]
+    rotation: 0
+    state: true
+- name: blocks_file_sink_0
+  id: blocks_file_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    append: 'False'
+    comment: 'BLOCK #7: Encoded Bitstream File Sink
+
+      Saves lossy LDAC encoded data to file
+
+      Contains compressed audio with artifacts
+
+      Can be decoded to hear quality loss'
+    file: /home/joelj/ldac_project/encoded_real_lossy.ldac
+    type: byte
+    unbuffered: 'False'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [992, 148.0]
+    rotation: 0
+    state: true
+- name: blocks_interleave_0
+  id: blocks_interleave
+  parameters:
+    affinity: ''
+    alias: ''
+    blocksize: '1'
+    comment: 'BLOCK #5: Interleave L/R Channels
+
+      Merges stereo channels into interleaved format
+
+      Format: LRLRLRLR... (required by LDAC)
+
+      Prepares signal for lossy encoding'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_streams: '2'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [304, 432.0]
+    rotation: 0
+    state: true
+- name: blocks_wavfile_sink_0
+  id: blocks_wavfile_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    append: 'False'
+    bits_per_sample1: FORMAT_PCM_16
+    bits_per_sample2: FORMAT_PCM_16
+    bits_per_sample3: FORMAT_VORBIS
+    bits_per_sample4: FORMAT_PCM_16
+    comment: 'BLOCK #10: Stereo WAV File Sink
+
+      Writes lossy decoded audio to WAV file
+
+      Format: 16-bit PCM stereo
+
+      Sample rate: 48000 Hz
+
+
+      This output shows characteristic lossy LDAC:
+
+      - Background noise/hiss (S16 quantization)
+
+      - Frame boundary artifacts (no crossfading)
+
+      - Audible codec compression artifacts'
+    file: /home/joelj/ldac_project/decoded_real_lossy.wav
+    format: FORMAT_WAV
+    nchan: '2'
+    samp_rate: samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1704, 332.0]
+    rotation: 0
+    state: true
+- name: blocks_wavfile_source_0
+  id: blocks_wavfile_source
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'BLOCK #4: Stereo WAV File Source
+
+      Reads input audio for lossy encoding
+
+      Converts to float for LDAC processing'
+    file: /home/joelj/ldac_project/input_48k.wav
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    nchan: '2'
+    repeat: 'False'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 408.0]
+    rotation: 0
+    state: true
+- name: ldac_ldac_decoder_cpp_0
+  id: ldac_ldac_decoder_cpp
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'BLOCK #8: LDAC Real Decoder (Unoptimized)
+
+      Based on decoder_wrapper_fixed.c implementation
+
+
+      Key Features:
+
+      - NO crossfading between frames
+
+      - NO noise reduction applied
+
+      - NO DC offset removal
+
+      - 150-frame output delay buffer
+
+      - Basic PCM conversion only
+
+
+      Algorithm Steps:
+
+      1. Frame Sync: Finds frame boundaries
+
+      2. Header Parse: Reads original audio params
+
+      3. Entropy Decode: Decompresses bitstream
+
+      4. Dequantization: Restores coefficients (lossy)
+
+      5. Inverse MDCT: Frequency to time domain
+
+      6. Overlap-Add: Basic synthesis (no smoothing)
+
+
+      Produces natural lossy codec output
+
+      with audible artifacts and noise
+
+
+      Input: LDAC encoded bytes
+
+      Output: Lossy float samples with artifacts'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [992, 360.0]
+    rotation: 0
+    state: true
+- name: ldac_ldac_encoder_cpp_0
+  id: ldac_ldac_encoder_cpp
+  parameters:
+    affinity: ''
+    alias: ''
+    channels: '2'
+    comment: 'BLOCK #6: LDAC Real Encoder (Lossy/Noisy)
+
+      Based on encoder_wrapper_fixed.c implementation
+
+
+      Key Features:
+
+      - S16 format (introduces quantization noise)
+
+      - 100-frame lookahead buffer
+
+      - Lanczos windowed-sinc resampling
+
+      - Produces characteristic lossy artifacts
+
+
+      Algorithm Steps:
+
+      1. Windowing: Overlap-add with lookahead
+
+      2. MDCT: Time to frequency transform
+
+      3. Psychoacoustic Model: Perceptual masking
+
+      4. Quantization: Lossy bit allocation (S16)
+
+      5. Entropy Coding: Huffman compression
+
+
+      Input: Interleaved float samples
+
+      Output: Lossy LDAC bitstream with header'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    mtu: ldac_mtu
+    quality: ldac_quality
+    sample_rate: samp_rate
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [600, 308.0]
+    rotation: 0
+    state: true
+
+connections:
+- [blocks_deinterleave_0, '0', blocks_wavfile_sink_0, '0']
+- [blocks_deinterleave_0, '1', blocks_wavfile_sink_0, '1']
+- [blocks_interleave_0, '0', ldac_ldac_encoder_cpp_0, '0']
+- [blocks_wavfile_source_0, '0', blocks_interleave_0, '0']
+- [blocks_wavfile_source_0, '1', blocks_interleave_0, '1']
+- [ldac_ldac_decoder_cpp_0, '0', blocks_deinterleave_0, '0']
+- [ldac_ldac_encoder_cpp_0, '0', blocks_file_sink_0, '0']
+- [ldac_ldac_encoder_cpp_0, '0', ldac_ldac_decoder_cpp_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.9.2
